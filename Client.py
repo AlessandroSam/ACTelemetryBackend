@@ -22,11 +22,11 @@ class Client:
 
     def set_subscription(self, subscription):
         """
-        Устанавливает и обновляет подписку клиента на данные.
+        Устанавливает подписку клиента на данные.
         :param subscription: список полей, на которые клиент подписывается.
         :return: нет.
         """
-        self.subscription = [].append(subscription)
+        self.subscription.append(subscription)
 
     def get_subscription(self):
         return self.subscription

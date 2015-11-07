@@ -8,6 +8,7 @@ import socket
 import select
 from Client import Client
 
+MSG_LENGTH = 1024
 
 class NetSender(threading.Thread):
     '''
@@ -105,6 +106,16 @@ class NetSender(threading.Thread):
             print("Got a connection from " + str(addr))
             conn.setblocking(False)
             client = Client(conn)
+            # ждём от клиента его подписки - какие данные, он, собственно, от нас хочет
+            subscr_string = ""
+            while 1:
+                data = str(conn.recv(MSG_LENGTH))
+                if data is not None:
+                    subscr_string += data
+                else:
+                    break
+            # Формат subscription-строки: названия полей, разделённые через запятую. Названия определены в sim_info.py
+            client.set_subscription(subscr_string.split(","))
             self.clients.append(client)
             self.clients_addr.append(addr)
             self.clientCount += 1

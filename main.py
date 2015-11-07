@@ -67,20 +67,22 @@ if __name__ == '__main__':
                 globalState = STATE_NOCLIENTS  # cleanup / remember state / ...?
 
             if globalState == STATE_NOCLIENTS:
-                # О
+                # Здесь будем проверять, не появился ли клиент
                 if net.clientCount > 0:
                     if prev_globalState == STATE_NOCLIENTS:
                         globalState = STATE_NODATA
                     else:
                         globalState = prev_globalState
                 else:
+                    # Нет, подождём ещё
                     print("No clients, waiting for another " + str(WAIT_INTERVAL) + " seconds.")
                     time.sleep(WAIT_INTERVAL)
 
             elif globalState == STATE_NODATA:
                 # Это состояние должно говорить, что AC не работает. И только это.
+                # Клиенты получают пустое сообщение.
                 simState.update()
-                if simState.static_json == "":
+                if simState.get_dynamic_info() is None:
                     print("No static data available, probably Assetto Corsa simulation is not running")
                     net.sendToAll(simState.JSON_EMPTY)
                     time.sleep(WAIT_INTERVAL)
@@ -95,8 +97,8 @@ if __name__ == '__main__':
                 # Достаём и рассылаем данные.
                 # TODO Перевод на механизм подписки
                 simState.update()
-                if simState.dynamic_json != "":
-                    if simState.dynamic_info.get("status") == 0:
+                if simState.get_dynamic_info() is not None:
+                    if simState.get_dynamic_info().get("status") == 0:
                         globalState = STATE_NODATA
                         time.sleep(CYCLE_INTERVAL)  # if still nothing, it will wait WAIT_INTERVAL
                     else:
