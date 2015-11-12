@@ -82,27 +82,26 @@ if __name__ == '__main__':
                 # Это состояние должно говорить, что AC не работает. И только это.
                 # Клиенты получают пустое сообщение.
                 simState.update()
-                if simState.get_dynamic_info() is None:
+                if len(simState.get_dynamic_info()) == 0:
                     print("No static data available, probably Assetto Corsa simulation is not running")
-                    net.sendToAll(simState.JSON_EMPTY)
+                    net.sendToAll({"type": "empty"})
                     time.sleep(WAIT_INTERVAL)
                 else:
                     # Статика есть. AC работает и можно с неё брать данные.
                     print("Static data received")
-                    net.sendToAll(simState.static_json)
+                    net.sendToAll(simState.get_static_info())
                     globalState = STATE_DYNAMIC  # один цикл динамики пропускаем, не важно, не навредит
                     time.sleep(CYCLE_INTERVAL)
 
             elif globalState == STATE_DYNAMIC:
                 # Достаём и рассылаем данные.
-                # TODO Перевод на механизм подписки
                 simState.update()
-                if simState.get_dynamic_info() is not None:
+                if len(simState.get_dynamic_info()) != 0:
                     if simState.get_dynamic_info().get("status") == 0:
                         globalState = STATE_NODATA
                         time.sleep(CYCLE_INTERVAL)  # if still nothing, it will wait WAIT_INTERVAL
                     else:
-                        net.sendToAll(simState.dynamic_json)
+                        net.sendToAll(simState.get_dynamic_info())
                         time.sleep(CYCLE_INTERVAL)
                 else:  # dynamic_json == "" which is the case after the simState cleanup on AC exit
                     globalState = STATE_NODATA

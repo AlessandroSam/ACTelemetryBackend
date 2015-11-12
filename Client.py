@@ -26,10 +26,17 @@ class Client:
         :param subscription: список полей, на которые клиент подписывается.
         :return: нет.
         """
-        self.subscription.append(subscription)
+        self.subscription = subscription
+        # тип сообщений мы должны отправлять в любом случае, но клиент не заявляет об этом явно
+        self.subscription.append("type")
+        self.state = Client.CS_SUBSCRIBED
 
     def get_subscription(self):
         return self.subscription
 
     def get_socket(self):
         return self.connection
+
+
+
+

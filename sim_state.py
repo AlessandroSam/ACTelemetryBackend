@@ -116,7 +116,7 @@ class SimState(object):
         # Последние устанавливаются в "" если AC не работает, так что клиент получает "пустое" сообщение
         # Статические данные не меняются в ходе одной игровой сессии.
         tmp_static_info = self.fill_static_fields()
-        if tmp_static_info is not None:
+        if tmp_static_info is not None:  # FIXME tmp_static_info может быть не None, но неактуальным/пустым
             self.static_info.update(tmp_static_info)
             # JSON для статики формируем сразу, он одинаков для всех и остаётся таковым в пределах игровой сессии
             self.static_json = json.dumps(self.static_info) + "\n"
@@ -131,6 +131,16 @@ class SimState(object):
                 # Статики нет, вероятно, игровая сессия закончилась. Очищаем всё, что было.
                 self.empty_data()
     # end            
-    
+
+    def create_dynamic_json(self, subscription):
+        result_dict = {}
+        for field in subscription:
+            data = self.dynamic_info.get(field)
+            if data is None:
+                print("Tried to retrieve non-existent field: " + field)
+            else:
+                result_dict.update({field: data})
+        return json.dumps(result_dict)
+
     def invalidate_dinfo(self):
         self.dynamic_valid = False
