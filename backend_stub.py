@@ -1,6 +1,8 @@
 '''
 Created on 02 September 2015
-
+Заменяет игру при тестировании Android-фронтенда.
+Использование: python backend_stub.py filename
+Несколько файлов data*.txt уже есть в репозитории
 @author Alexandr Samoylov
 '''
 from NetSender import NetSender
